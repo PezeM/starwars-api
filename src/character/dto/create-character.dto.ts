@@ -1,4 +1,3 @@
-import { Character } from './character.interface';
 import {
   IsArray,
   IsAscii,
@@ -6,8 +5,9 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { Character } from '../entities/character.entity';
 
-export class CreateCharacterDto implements Character {
+export class CreateCharacterDto extends Character {
   @IsString()
   @IsNotEmpty()
   @IsAscii()
