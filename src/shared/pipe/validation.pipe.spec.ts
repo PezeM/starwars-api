@@ -1,6 +1,6 @@
 import { ValidationPipe } from './validation.pipe';
 import { ArgumentMetadata, BadRequestException } from '@nestjs/common';
-import { CreateCharacterDto } from '../../character/create-character.dto';
+import { CreateCharacterDto } from '../../character/dto/create-character.dto';
 
 describe('ValidationPipe', () => {
   let target: ValidationPipe;

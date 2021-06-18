@@ -1,4 +1,3 @@
-import { Character } from './character.interface';
 import {
   IsArray,
   IsAscii,
@@ -6,8 +5,10 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { PartialType } from '@nestjs/swagger';
+import { Character } from '../entities/character.entity';
 
-export class UpdateCharacterDto implements Partial<Character> {
+export class UpdateCharacterDto extends PartialType(Character) {
   @IsString()
   @IsOptional()
   @IsNotEmpty()

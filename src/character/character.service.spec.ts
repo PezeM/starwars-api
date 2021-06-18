@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CharacterService } from './character.service';
-import { CreateCharacterDto } from './create-character.dto';
-import { UpdateCharacterDto } from './update-character.dto';
-import { PaginationMetadata } from '../shared/pagination-metadata.interface';
+import { CreateCharacterDto } from './dto/create-character.dto';
+import { UpdateCharacterDto } from './dto/update-character.dto';
+import { PaginationMetadata } from '../shared/pagination-metadata.entity';
 
 describe('CharacterService', () => {
   let service: CharacterService;
@@ -41,13 +41,13 @@ describe('CharacterService', () => {
     });
 
     it('should return pagination meta', () => {
-      const emptyPaginationMeta: PaginationMetadata = {
+      const emptyPaginationMeta = new PaginationMetadata({
         page: 1,
         totalItems: 0,
         totalPages: 0,
         previousPage: null,
         nextPage: null,
-      };
+      });
 
       const response = service.findAll();
 

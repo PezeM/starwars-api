@@ -16,15 +16,22 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { CharacterService } from './character.service';
-import { CharactersResponse } from './characters-response.interface';
-import { CreateCharacterDto } from './create-character.dto';
-import { UpdateCharacterDto } from './update-character.dto';
+import { CreateCharacterDto } from './dto/create-character.dto';
+import { UpdateCharacterDto } from './dto/update-character.dto';
 import { ValidationPipe } from '../shared/pipe/validation.pipe';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CharactersResponse } from './dto/characters-response.dto';
 
+@ApiTags('characters')
 @Controller('characters')
 export class CharacterController {
   constructor(private readonly characterService: CharacterService) {}
 
+  @ApiOperation({})
+  @ApiOkResponse({
+    description: 'Retrieved list of characters and pagination data',
+    type: CharactersResponse,
+  })
   @Get()
   findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,

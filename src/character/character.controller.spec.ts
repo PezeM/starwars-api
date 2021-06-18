@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CharacterController } from './character.controller';
 import { CharacterService } from './character.service';
-import { Character } from './character.interface';
-import { PaginationMetadata } from '../shared/pagination-metadata.interface';
-import { CreateCharacterDto } from './create-character.dto';
+import { CreateCharacterDto } from './dto/create-character.dto';
 import {
   ConflictException,
   HttpStatus,
   NotFoundException,
 } from '@nestjs/common';
-import { UpdateCharacterDto } from './update-character.dto';
+import { UpdateCharacterDto } from './dto/update-character.dto';
+import { Character } from './entities/character.entity';
+import { PaginationMetadata } from '../shared/pagination-metadata.entity';
 
 describe('CharacterController', () => {
   let controller: CharacterController;
@@ -21,13 +21,14 @@ describe('CharacterController', () => {
     episodes: ['NEWHOPE', 'EMPIRE', 'JEDI'],
     planet: 'Alderaan',
   };
-  const paginationMeta: PaginationMetadata = {
+  const paginationMeta = new PaginationMetadata({
     page: 1,
     totalItems: 1,
     totalPages: 1,
     previousPage: null,
     nextPage: null,
-  };
+  });
+
   const response = {
     statusCode: 0,
     send: (body?: any) => {},

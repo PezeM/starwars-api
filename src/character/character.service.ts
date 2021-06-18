@@ -1,30 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { Character } from './character.interface';
-import { CharactersResponse } from './characters-response.interface';
-import { PaginationMetadata } from '../shared/pagination-metadata.interface';
-import { UpdateCharacterDto } from './update-character.dto';
-import { CreateCharacterDto } from './create-character.dto';
+import { UpdateCharacterDto } from './dto/update-character.dto';
+import { CreateCharacterDto } from './dto/create-character.dto';
+import { Character } from './entities/character.entity';
+import { CharactersResponse } from './dto/characters-response.dto';
+import { PaginationMetadata } from '../shared/pagination-metadata.entity';
 
 @Injectable()
 export class CharacterService {
   private characters: Character[] = [];
 
   findAll(page = 1, limit = 10): CharactersResponse {
+    limit ||= 10;
     const totalPages = Math.ceil(this.characters.length / limit);
     const offset = limit * (page - 1);
     const characters = this.characters.slice(offset, limit * page);
-    const paginationMeta: PaginationMetadata = {
+    const paginationMeta = new PaginationMetadata({
       page,
       totalPages,
       totalItems: this.characters.length,
       nextPage: totalPages > page ? page + 1 : null,
       previousPage: page - 1 > 0 ? page - 1 : null,
-    };
+    });
 
-    return {
-      characters,
-      meta: paginationMeta,
-    };
+    return new CharactersResponse(characters, paginationMeta);
   }
 
   findByName(name: string): Character | undefined {
