@@ -5,31 +5,36 @@ import {
   DefaultValuePipe,
   Delete,
   Get,
-  HttpStatus,
   NotFoundException,
   Param,
   ParseIntPipe,
   Post,
   Put,
   Query,
-  Res,
   UsePipes,
 } from '@nestjs/common';
 import { CharacterService } from './character.service';
 import { CreateCharacterDto } from './dto/create-character.dto';
 import { UpdateCharacterDto } from './dto/update-character.dto';
 import { ValidationPipe } from '../shared/pipe/validation.pipe';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiConflictResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CharactersResponse } from './dto/characters-response.dto';
+import { Character } from './entities/character.entity';
 
 @ApiTags('characters')
 @Controller('characters')
 export class CharacterController {
   constructor(private readonly characterService: CharacterService) {}
 
-  @ApiOperation({})
+  @ApiOperation({ summary: 'Retrieved list of characters and pagination data' })
   @ApiOkResponse({
-    description: 'Retrieved list of characters and pagination data',
+    description: 'Returns characters list data with pagination metadata',
     type: CharactersResponse,
   })
   @Get()
@@ -40,19 +45,35 @@ export class CharacterController {
     return this.characterService.findAll(page, limit);
   }
 
+  @ApiOperation({ summary: 'Retrieved single character by name' })
+  @ApiOkResponse({
+    description: 'Returns single character data',
+    type: Character,
+  })
+  @ApiNotFoundResponse({
+    description: "Character with given name doesn't exist",
+  })
   @Get(':name')
-  getCharacterByName(@Res() res, @Param('name') name: string) {
+  getCharacterByName(@Param('name') name: string) {
     const character = this.characterService.findByName(name);
     if (!character) {
       throw new NotFoundException('Character does not exist!');
     }
 
-    return res.status(HttpStatus.OK).json(character);
+    return character;
   }
 
+  @ApiOperation({ summary: 'Add new character to characters list' })
+  @ApiOkResponse({
+    description: 'Returns newly created character data',
+    type: Character,
+  })
+  @ApiConflictResponse({
+    description: 'Character with given name is already defined',
+  })
   @Post()
   @UsePipes(new ValidationPipe())
-  createCharacter(@Res() res, @Body() character: CreateCharacterDto) {
+  createCharacter(@Body() character: CreateCharacterDto) {
     const newCharacter = this.characterService.create(character);
 
     if (!newCharacter) {
@@ -61,16 +82,20 @@ export class CharacterController {
       );
     }
 
-    return res.status(HttpStatus.OK).json({
-      message: 'Character has been successfully created!',
-      character: newCharacter,
-    });
+    return { character: newCharacter };
   }
 
+  @ApiOperation({ summary: 'Updates character data' })
+  @ApiOkResponse({
+    description: 'Returns updated character data',
+    type: Character,
+  })
+  @ApiNotFoundResponse({
+    description: "Character with given name doesn't exist",
+  })
   @Put(':name')
   @UsePipes(new ValidationPipe())
   updateCharacter(
-    @Res() res,
     @Param('id') name: string,
     @Body() character: UpdateCharacterDto,
   ) {
@@ -79,21 +104,23 @@ export class CharacterController {
       throw new NotFoundException('Character does not exist!');
     }
 
-    return res.status(HttpStatus.OK).json({
-      message: 'Character has been successfully updated!',
-      character: updatedCharacter,
-    });
+    return { character: updatedCharacter };
   }
 
+  @ApiOperation({ summary: 'Deletes character from character list' })
+  @ApiOkResponse({
+    description: 'Returns true if character was deleted',
+  })
+  @ApiNotFoundResponse({
+    description: "Character with given name doesn't exist",
+  })
   @Delete(':name')
-  deleteCharacterByName(@Res() res, @Param(':name') name: string) {
-    const deletedPost = this.characterService.delete(name);
-    if (!deletedPost) {
+  deleteCharacterByName(@Param(':name') name: string): boolean {
+    const deletedCharacter = this.characterService.delete(name);
+    if (!deletedCharacter) {
       throw new NotFoundException('Character does not exist!');
     }
 
-    return res.status(HttpStatus.OK).json({
-      message: 'Character has been successfully deleted!',
-    });
+    return deletedCharacter;
   }
 }

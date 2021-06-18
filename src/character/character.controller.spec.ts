@@ -4,7 +4,6 @@ import { CharacterService } from './character.service';
 import { CreateCharacterDto } from './dto/create-character.dto';
 import {
   ConflictException,
-  HttpStatus,
   NotFoundException,
 } from '@nestjs/common';
 import { UpdateCharacterDto } from './dto/update-character.dto';
@@ -28,16 +27,6 @@ describe('CharacterController', () => {
     previousPage: null,
     nextPage: null,
   });
-
-  const response = {
-    statusCode: 0,
-    send: (body?: any) => {},
-    status: (code: number) => {
-      response.statusCode = code;
-      return response;
-    },
-    json: (data: any) => data,
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -79,7 +68,7 @@ describe('CharacterController', () => {
     });
 
     it('should return one character on by name', () => {
-      const result = controller.getCharacterByName(response, testCharacterName);
+      const result = controller.getCharacterByName(testCharacterName);
 
       expect(result).toBeDefined();
       expect(result.name).toBe(testCharacterName);
@@ -90,17 +79,14 @@ describe('CharacterController', () => {
       service.findByName = jest.fn().mockReturnValue(undefined);
 
       expect(() => {
-        controller.getCharacterByName(response, testCharacterName);
+        controller.getCharacterByName(testCharacterName);
       }).toThrow(NotFoundException);
     });
   });
 
   describe('POST /characters', () => {
     it('should create character on POST /characters', () => {
-      const result = controller.createCharacter(
-        response,
-        new CreateCharacterDto(),
-      );
+      const result = controller.createCharacter(new CreateCharacterDto());
 
       expect(result).toBeDefined();
       expect(result.character).toMatchObject(testCharacter);
@@ -111,7 +97,7 @@ describe('CharacterController', () => {
       service.create = jest.fn().mockReturnValue(undefined);
 
       expect(() => {
-        controller.createCharacter(response, new CreateCharacterDto());
+        controller.createCharacter(new CreateCharacterDto());
       }).toThrow(ConflictException);
     });
   });
@@ -119,7 +105,6 @@ describe('CharacterController', () => {
   describe('PUT /characters', () => {
     it('should return updated character', () => {
       const result = controller.updateCharacter(
-        response,
         testCharacterName,
         new UpdateCharacterDto(),
       );
@@ -133,20 +118,16 @@ describe('CharacterController', () => {
       service.update = jest.fn().mockReturnValue(undefined);
 
       expect(() => {
-        controller.updateCharacter(
-          response,
-          testCharacterName,
-          new UpdateCharacterDto(),
-        );
+        controller.updateCharacter(testCharacterName, new UpdateCharacterDto());
       }).toThrow(NotFoundException);
     });
   });
 
   describe('DELETE /characters', () => {
     it('should return success status when deleted successfully', () => {
-      controller.deleteCharacterByName(response, testCharacterName);
+      const response = controller.deleteCharacterByName(testCharacterName);
 
-      expect(response.statusCode).toBe(HttpStatus.OK);
+      expect(response).toBe(true);
       expect(service.delete).toBeCalled();
     });
 
@@ -154,7 +135,7 @@ describe('CharacterController', () => {
       service.delete = jest.fn().mockReturnValue(undefined);
 
       expect(() => {
-        controller.deleteCharacterByName(response, testCharacterName);
+        controller.deleteCharacterByName(testCharacterName);
       }).toThrow(NotFoundException);
     });
   });

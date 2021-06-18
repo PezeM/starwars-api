@@ -63,7 +63,7 @@ describe('CharacterService', () => {
       expect(response).toBe(undefined);
     });
 
-    it('should return character if it exists', () => {
+    it('should return character if it exist', () => {
       const characterName = 'Luke';
       addNewCharacter(characterName);
 
