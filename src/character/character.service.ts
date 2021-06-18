@@ -31,7 +31,10 @@ export class CharacterService {
     return this.characters.find(c => c.name === name);
   }
 
-  create(newCharacter: CreateCharacterDto): Character {
+  create(newCharacter: CreateCharacterDto): Character | undefined {
+    if (this.characters.some(c => c.name === newCharacter.name))
+      return undefined;
+
     this.characters.push(newCharacter);
     return newCharacter;
   }

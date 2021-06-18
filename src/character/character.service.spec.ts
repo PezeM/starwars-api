@@ -1,9 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CharacterService } from './character.service';
 import { CreateCharacterDto } from './create-character.dto';
+import { UpdateCharacterDto } from './update-character.dto';
+import { PaginationMetadata } from '../shared/pagination-metadata.interface';
 
 describe('CharacterService', () => {
   let service: CharacterService;
+
+  const addNewCharacter = (
+    name = 'Luke',
+    episodes = ['NEWHOPE'],
+    planet = undefined,
+  ) => {
+    const characterDto = new CreateCharacterDto();
+    characterDto.name = name;
+    characterDto.episodes = episodes;
+    characterDto.planet = planet;
+
+    return service.create(characterDto);
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,25 +32,107 @@ describe('CharacterService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should add new character', () => {
-    const characterName = 'Luke';
-    const characterEpisodes = ['NEWHOPE'];
+  describe('findAll', () => {
+    it('should return empty list of characters', () => {
+      const response = service.findAll();
 
-    const characterDto = new CreateCharacterDto();
-    characterDto.name = characterName;
-    characterDto.episodes = characterEpisodes;
+      expect(response).toBeDefined();
+      expect(response.characters.length).toBe(0);
+    });
 
-    const newCharacter = service.create(characterDto);
-    expect(newCharacter).toBeDefined();
-    expect(newCharacter.name).toBe(characterName);
-    expect(newCharacter.episodes).toBe(characterEpisodes);
+    it('should return pagination meta', () => {
+      const emptyPaginationMeta: PaginationMetadata = {
+        page: 1,
+        totalItems: 0,
+        totalPages: 0,
+        previousPage: null,
+        nextPage: null,
+      };
+
+      const response = service.findAll();
+
+      expect(response).toBeDefined();
+      expect(response.meta).toBeDefined();
+      expect(response.meta).toMatchObject(emptyPaginationMeta);
+    });
   });
 
-  describe('deleteCharacter', () => {
+  describe('findByName', () => {
+    it('should return undefined when no character is found', () => {
+      const response = service.findByName('Non existing character');
+      expect(response).toBe(undefined);
+    });
+
+    it('should return character if it exists', () => {
+      const characterName = 'Luke';
+      addNewCharacter(characterName);
+
+      const response = service.findByName(characterName);
+      expect(response).toBeDefined();
+      expect(response.name).toBe(characterName);
+    });
+  });
+
+  describe('create', () => {
+    it('should add new character', () => {
+      const characterName = 'Darth Vader';
+      const characterEpisodes = ['EMPIRE'];
+
+      const newCharacter = addNewCharacter(characterName, characterEpisodes);
+      expect(newCharacter).toBeDefined();
+      expect(newCharacter.name).toBe(characterName);
+      expect(newCharacter.episodes).toBe(characterEpisodes);
+      expect(newCharacter.planet).toBeUndefined();
+      const characterList = service.findAll();
+      expect(characterList.characters.length).toBe(1);
+    });
+
+    it('should return undefined when adding existing character', () => {
+      const characterName = 'Darth Vader';
+      const characterEpisodes = ['EMPIRE'];
+
+      addNewCharacter(characterName, characterEpisodes);
+      const response = addNewCharacter(characterName, characterEpisodes);
+      expect(response).toBeUndefined();
+      const characterList = service.findAll();
+      expect(characterList.characters.length).toBe(1);
+    });
+  });
+
+  describe('update', () => {
+    it('should return undefined when updating non existing character', () => {
+      const response = service.update(
+        'Non existing character',
+        new UpdateCharacterDto(),
+      );
+      expect(response).toBeFalsy();
+    });
+
+    it('should return updated character', () => {
+      const characterName = 'Luke';
+      const newCharacterName = 'New character name';
+      addNewCharacter(characterName);
+
+      const characterUpdate = new UpdateCharacterDto();
+      characterUpdate.name = newCharacterName;
+      const response = service.update(characterName, characterUpdate);
+      expect(response).toBeDefined();
+      expect(response.name).toBe(newCharacterName);
+    });
+  });
+
+  describe('delete', () => {
     it('should return false when deleting non existing character', () => {
       const response = service.deleteByName('Non existing character');
-      expect(typeof response).toBe('boolean');
-      expect(response).toBe(false);
+      expect(response).toBeFalsy();
+    });
+
+    it('should return true when deleting existing character', () => {
+      const characterName = 'Luke';
+      addNewCharacter(characterName);
+
+      const response = service.deleteByName(characterName);
+      expect(response).toBe(true);
     });
   });
 });
