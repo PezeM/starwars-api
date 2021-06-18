@@ -22,6 +22,8 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { CharactersResponse } from './dto/characters-response.dto';
@@ -36,6 +38,18 @@ export class CharacterController {
   @ApiOkResponse({
     description: 'Returns characters list data with pagination metadata',
     type: CharactersResponse,
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Number of page to query',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Count of characters per page',
+    example: 10,
   })
   @Get()
   findAll(
@@ -53,6 +67,7 @@ export class CharacterController {
   @ApiNotFoundResponse({
     description: "Character with given name doesn't exist",
   })
+  @ApiParam({ name: 'name', description: 'Name of character to find' })
   @Get(':name')
   getCharacterByName(@Param('name') name: string) {
     const character = this.characterService.findByName(name);
@@ -93,10 +108,11 @@ export class CharacterController {
   @ApiNotFoundResponse({
     description: "Character with given name doesn't exist",
   })
+  @ApiParam({ name: 'name', description: 'Name of character to delete' })
   @Put(':name')
   @UsePipes(new ValidationPipe())
   updateCharacter(
-    @Param('id') name: string,
+    @Param('name') name: string,
     @Body() character: UpdateCharacterDto,
   ) {
     const updatedCharacter = this.characterService.update(name, character);
@@ -114,8 +130,9 @@ export class CharacterController {
   @ApiNotFoundResponse({
     description: "Character with given name doesn't exist",
   })
+  @ApiParam({ name: 'name', description: 'Name of character to delete' })
   @Delete(':name')
-  deleteCharacterByName(@Param(':name') name: string): boolean {
+  deleteCharacterByName(@Param('name') name: string): boolean {
     const deletedCharacter = this.characterService.delete(name);
     if (!deletedCharacter) {
       throw new NotFoundException('Character does not exist!');
