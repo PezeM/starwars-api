@@ -135,4 +135,36 @@ describe('CharacterService', () => {
       expect(response).toBe(true);
     });
   });
+
+  describe('all methods', () => {
+    it('should get all characters, create new character, find character, update character, delete character, and get all characters', () => {
+      const emptyCatList = service.findAll();
+      expect(emptyCatList).toBeDefined();
+      expect(emptyCatList.characters.length).toBe(0);
+
+      const characterName = 'Character name';
+      const addedCharacter = addNewCharacter(characterName);
+      expect(addedCharacter).toBeDefined();
+      expect(addedCharacter.name).toBe(characterName);
+
+      const findResponse = service.findByName(characterName);
+      expect(findResponse).toEqual(addedCharacter);
+
+      const newCharacterName = 'New character name';
+      const characterUpdate = new UpdateCharacterDto();
+      characterUpdate.name = newCharacterName;
+      const updateCharacterResponse = service.update(
+        characterName,
+        characterUpdate,
+      );
+      expect(updateCharacterResponse.name).toBe(newCharacterName);
+
+      const response = service.delete(newCharacterName);
+      expect(response).toBe(true);
+
+      const finalCharacterList = service.findAll();
+      expect(finalCharacterList).toBeDefined();
+      expect(finalCharacterList.characters.length).toBe(0);
+    });
+  });
 });
