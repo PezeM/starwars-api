@@ -26,15 +26,15 @@ export class CharacterController {
   constructor(private readonly characterService: CharacterService) {}
 
   @Get()
-  async findAll(
+  findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit?: number,
-  ): Promise<CharactersResponse> {
+  ): CharactersResponse {
     return this.characterService.findAll(page, limit);
   }
 
   @Get(':name')
-  async getCharacterByName(@Res() res, @Param('name') name: string) {
+  getCharacterByName(@Res() res, @Param('name') name: string) {
     const character = this.characterService.findByName(name);
     if (!character) {
       throw new NotFoundException('Character does not exist!');
@@ -45,7 +45,7 @@ export class CharacterController {
 
   @Post()
   @UsePipes(new ValidationPipe())
-  async createCharacter(@Res() res, @Body() character: CreateCharacterDto) {
+  createCharacter(@Res() res, @Body() character: CreateCharacterDto) {
     const newCharacter = this.characterService.create(character);
 
     if (!newCharacter) {
@@ -62,7 +62,7 @@ export class CharacterController {
 
   @Put(':name')
   @UsePipes(new ValidationPipe())
-  async updateCharacter(
+  updateCharacter(
     @Res() res,
     @Param('id') name: string,
     @Body() character: UpdateCharacterDto,
@@ -79,8 +79,8 @@ export class CharacterController {
   }
 
   @Delete(':name')
-  async deleteCharacterByName(@Res() res, @Param(':name') name: string) {
-    const deletedPost = this.characterService.deleteByName(name);
+  deleteCharacterByName(@Res() res, @Param(':name') name: string) {
+    const deletedPost = this.characterService.delete(name);
     if (!deletedPost) {
       throw new NotFoundException('Character does not exist!');
     }

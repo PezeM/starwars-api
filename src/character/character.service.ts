@@ -49,7 +49,7 @@ export class CharacterService {
     return this.characters[index];
   }
 
-  deleteByName(name: string): boolean {
+  delete(name: string): boolean {
     const index = this.characters.findIndex(c => c.name === name);
     if (index < 0) return false;
     this.characters.splice(index, 1);

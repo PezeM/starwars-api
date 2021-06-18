@@ -123,7 +123,7 @@ describe('CharacterService', () => {
 
   describe('delete', () => {
     it('should return false when deleting non existing character', () => {
-      const response = service.deleteByName('Non existing character');
+      const response = service.delete('Non existing character');
       expect(response).toBeFalsy();
     });
 
@@ -131,7 +131,7 @@ describe('CharacterService', () => {
       const characterName = 'Luke';
       addNewCharacter(characterName);
 
-      const response = service.deleteByName(characterName);
+      const response = service.delete(characterName);
       expect(response).toBe(true);
     });
   });
