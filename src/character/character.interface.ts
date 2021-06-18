@@ -1,5 +1,5 @@
 export interface Character {
-  name: string[];
+  name: string;
   episodes: string[];
   planet?: string;
 }
