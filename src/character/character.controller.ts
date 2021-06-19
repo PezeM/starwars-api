@@ -34,7 +34,7 @@ import { Character } from './entities/character.entity';
 export class CharacterController {
   constructor(private readonly characterService: CharacterService) {}
 
-  @ApiOperation({ summary: 'Retrieved list of characters and pagination data' })
+  @ApiOperation({ summary: 'Returns list of characters and pagination data' })
   @ApiOkResponse({
     description: 'Returns characters list data with pagination metadata',
     type: CharactersResponse,
@@ -59,7 +59,7 @@ export class CharacterController {
     return this.characterService.findAll(page, limit);
   }
 
-  @ApiOperation({ summary: 'Retrieved single character by name' })
+  @ApiOperation({ summary: 'Returns single character by name' })
   @ApiOkResponse({
     description: 'Returns single character data',
     type: Character,
@@ -78,7 +78,7 @@ export class CharacterController {
     return character;
   }
 
-  @ApiOperation({ summary: 'Add new character to characters list' })
+  @ApiOperation({ summary: 'Adds new character to characters list' })
   @ApiOkResponse({
     description: 'Returns newly created character data',
     type: Character,
@@ -108,7 +108,7 @@ export class CharacterController {
   @ApiNotFoundResponse({
     description: "Character with given name doesn't exist",
   })
-  @ApiParam({ name: 'name', description: 'Name of character to delete' })
+  @ApiParam({ name: 'name', description: 'Name of the character to delete' })
   @Put(':name')
   @UsePipes(new ValidationPipe())
   updateCharacter(

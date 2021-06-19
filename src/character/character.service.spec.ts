@@ -40,7 +40,7 @@ describe('CharacterService', () => {
       expect(response.characters.length).toBe(0);
     });
 
-    it('should return pagination meta', () => {
+    it('should return default pagination meta when there are no characters', () => {
       const emptyPaginationMeta = new PaginationMetadata({
         page: 1,
         totalItems: 0,
