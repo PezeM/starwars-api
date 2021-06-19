@@ -1,0 +1,26 @@
+service:
+  name: starwars-api-lambda
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'dev'}
+  apiGateway:
+    shouldStartNameWithService: true
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+
+package:
+  exclude:
+    - node_modules/typescript/**
+    - node_modules/@types/**
+
+functions:
+  main:
+    handler: src/index.handler
+    events:
+      - http:
+          method: any
+          path: /{any+}
